@@ -12,24 +12,55 @@
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'arco'}catch(e){document.documentElement.dataset.theme='arco'}</script>
 <style>
-:root{--bg:#0b0d10;--s1:#14171b;--s2:#1b1f24;--line:#242a31;--text:#e8ecf0;--muted:#7d8792;--ok:#37d67a;--low:#ffb020;--high:#ff6b5d;--st:var(--muted)}
+:root,[data-theme=arco]{--bg:#0b0d10;--s1:#14171b;--s2:#1b1f24;--line:#242a31;--tick:#3a424b;--text:#e8ecf0;--muted:#7d8792;--ok:#37d67a;--low:#ffb020;--high:#ff6b5d;--onText:var(--onText);--noteW:700}
+[data-theme=regua]{--bg:#f5f3ef;--s1:#fff;--s2:#ebe8e2;--line:#dcd8d0;--tick:#b3ada2;--text:#1d1d1b;--muted:#7a756c;--ok:#1f9d55;--low:#c77700;--high:#d64534;--onText:#14532d;--noteW:300}
+[data-theme=anel]{--bg:#000;--s1:#0c0c0c;--s2:#141414;--line:#222;--tick:#3a3a3a;--text:#f2f2f2;--muted:#777;--ok:#4ade80;--low:#fbbf24;--high:#f87171;--onText:#d1fae5;--noteW:200}
+[data-theme=leds]{--bg:#0f1320;--s1:#161b2c;--s2:#1c2236;--line:#272f48;--tick:#3d4766;--text:#e6e9f5;--muted:#8088a6;--ok:#2dd4bf;--low:#fbbf24;--high:#fb7185;--onText:#ccfbf1;--noteW:600}
+:root{--st:var(--muted)}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 body{padding:max(10px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
 main{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:20px;min-height:calc(100dvh - 26px)}
 button{font:inherit;color:var(--text);background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-height:44px;cursor:pointer;touch-action:manipulation;transition:background .15s,border-color .15s,color .15s}
 button:active{transform:scale(.97)}
-button.on{background:color-mix(in srgb,var(--ok) 16%,var(--s2));border-color:var(--ok);color:#c9f7da}
+button.on{background:color-mix(in srgb,var(--ok) 16%,var(--s2));border-color:var(--ok);color:var(--onText)}
 header{display:flex;align-items:center;justify-content:space-between}
 h1{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:600}
 .icon{background:none;border:0;width:44px;padding:0;color:var(--muted);font-size:22px}
-#tuner{text-align:center}
-#gauge{width:100%;display:block}
+#tuner{text-align:center;display:grid;grid-template-columns:100%;justify-items:center}
+.meter{display:none;width:100%}
+.meter svg{width:100%;display:block}
+.meter text{fill:var(--muted);font-size:9px}
+.zone{stroke:var(--ok);opacity:.3}
+.tk{stroke:var(--line)}.tk.mj{stroke:var(--tick)}.tk.z{stroke:var(--ok)}
 #needle{stroke:var(--st);transition:stroke .15s}
-#hub{fill:var(--st);transition:fill .15s}
-.note{margin-top:-46px;line-height:1}
-#note{font-size:64px;font-weight:700;color:var(--st);transition:color .15s;letter-spacing:-.02em}
+#hub,#ringDot{fill:var(--st);transition:fill .15s}
+.note{line-height:1}
+#note{font-size:64px;font-weight:var(--noteW);color:var(--st);transition:color .15s;letter-spacing:-.02em}
+[data-theme=arco] .m-arc,[data-theme=anel] .m-ring,[data-theme=regua] .m-bar{display:block}
+[data-theme=leds] .m-led{display:flex}
+[data-theme=arco] .note{margin-top:-46px}
+[data-theme=regua] .note,[data-theme=leds] .note{order:-1;margin:28px 0 26px}
+[data-theme=regua] #note,[data-theme=leds] #note{font-size:88px}
+[data-theme=anel] .m-ring{width:min(100%,300px)}
+[data-theme=anel] .m-ring,[data-theme=anel] .note{grid-area:1/1;align-self:center}
+[data-theme=anel] #note{font-size:76px}
+.bar{position:relative;height:40px}
+.bar i{position:absolute;top:14px;width:1px;height:12px;background:var(--line);transform:translateX(-50%)}
+.bar i.mj{background:var(--tick);top:10px;height:20px}
+.bar i.z{background:var(--ok);width:2px;top:4px;height:32px}
+.bar .zn{position:absolute;top:18px;height:4px;left:47%;width:6%;background:var(--ok);opacity:.3;border-radius:2px}
+#barMark{position:absolute;top:0;left:50%;width:4px;height:40px;margin-left:-2px;border-radius:2px;background:var(--st);transition:background .15s}
+.barlbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+.m-led{gap:4px;justify-content:center;align-items:center;height:44px}
+.m-led i{width:calc((100% - 80px)/21);max-width:14px;height:22px;border-radius:3px;background:var(--line);transition:background .08s}
+.m-led i.c{height:34px}
+.m-led i.lit{background:var(--st);box-shadow:0 0 12px var(--st)}
+.themes{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.themes button{display:flex;align-items:center;gap:10px}
+.sw{width:22px;height:22px;border-radius:6px;flex:none;border:1px solid #8884}
 #oct{font-size:22px;color:var(--muted);font-weight:600;margin-left:2px}
 .sub{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;margin-top:8px;min-height:18px}
 #status{display:inline-block;margin-top:14px;font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--st);transition:color .15s;min-height:20px}
@@ -44,9 +75,9 @@ h1{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute
 .course span{font-size:10px;color:var(--muted);text-align:center}
 .course button{padding:6px 0;font-weight:600}
 .course button+button{min-height:34px;font-size:12px;font-weight:500;color:var(--muted)}
-.course button.on{color:#c9f7da}
+.course button.on{color:var(--onText)}
 #a4btn{width:100%;margin-top:6px;font-size:13px;color:var(--muted)}
-#a4btn.on{color:#c9f7da}
+#a4btn.on{color:var(--onText)}
 dialog{border:0;padding:0;background:transparent;color:var(--text);max-width:460px;width:100%;margin:auto auto 0}
 dialog::backdrop{background:#000a}
 .sheet{background:var(--s1);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:16px 16px max(20px,env(safe-area-inset-bottom));display:grid;gap:18px}
@@ -69,11 +100,14 @@ input[type=range]{width:100%;accent-color:var(--ok);margin:10px 0 0;height:28px}
   </header>
 
   <section id="tuner" data-st="idle">
-    <svg id="gauge" viewBox="0 0 300 170" aria-hidden="true">
-      <g id="ticks"></g>
+    <div class="meter m-arc"><svg viewBox="0 0 300 170" aria-hidden="true">
+      <g id="arcTicks"></g>
       <line id="needle" x1="150" y1="160" x2="150" y2="48" stroke-width="2.5" stroke-linecap="round"/>
       <circle id="hub" cx="150" cy="160" r="5"/>
-    </svg>
+    </svg></div>
+    <div class="meter m-ring"><svg viewBox="0 0 300 300" aria-hidden="true"><g id="ringTicks"></g><circle id="ringDot" r="9" cx="150" cy="30"/></svg></div>
+    <div class="meter m-bar"><div class="bar" id="bar"><span class="zn"></span><b id="barMark"></b></div><div class="barlbl"><span>♭ −50</span><span>0</span><span>+50 ♯</span></div></div>
+    <div class="meter m-led" id="leds" aria-hidden="true"></div>
     <div class="note"><span id="note">–</span><span id="oct"></span></div>
     <div class="sub" id="sub">&nbsp;</div>
     <div id="status" role="status" aria-live="polite">Afinador desligado</div>
@@ -91,6 +125,7 @@ input[type=range]{width:100%;accent-color:var(--ok);margin:10px 0 0;height:28px}
 <dialog id="cfg">
   <div class="sheet">
     <header><h1>Configurações</h1><button class="icon" id="closeCfg" aria-label="Fechar">✕</button></header>
+    <div class="field"><label>Tema</label><div class="themes" id="themes"></div></div>
     <div class="field">
       <label>Calibração</label>
       <div class="row">
@@ -141,19 +176,33 @@ function ac() {
   return ctx;
 }
 
-/* ---------- Gauge ---------- */
-const CX = 150, CY = 160, R = 125, DEG = 1.6; // ±50 cents -> ±80°
-(function drawGauge() {
-  const pt = (c, r) => { const a = c * DEG * Math.PI / 180; return [CX + r * Math.sin(a), CY - r * Math.cos(a)]; };
+/* ---------- Medidores (um por tema) ---------- */
+const CX = 150, CY = 160, DEG = 1.6, RING = 2.7; // arco ±80°, anel ±135°
+function ticksSVG(cx, cy, R, k, labels) {
+  const pt = (c, r) => { const a = c * k * Math.PI / 180; return [cx + r * Math.sin(a), cy - r * Math.cos(a)]; };
   const [x1, y1] = pt(-3, R), [x2, y2] = pt(3, R);
-  let s = `<path d="M${x1} ${y1}A${R} ${R} 0 0 1 ${x2} ${y2}" stroke="#37d67a" stroke-width="10" stroke-linecap="round" fill="none" opacity=".3"/>`;
+  let s = `<path class="zone" d="M${x1} ${y1}A${R} ${R} 0 0 1 ${x2} ${y2}" stroke-width="10" stroke-linecap="round" fill="none"/>`;
   for (let c = -50; c <= 50; c += 5) {
     const major = c % 10 === 0, [a, b] = pt(c, R - (major ? 10 : 5)), [e, f] = pt(c, R);
-    s += `<line x1="${a}" y1="${b}" x2="${e}" y2="${f}" stroke="${c === 0 ? '#37d67a' : major ? '#4a535d' : '#2c333b'}" stroke-width="${c === 0 ? 2.5 : 1.5}" stroke-linecap="round"/>`;
-    if (major && c) { const [tx, ty] = pt(c, R + 12); s += `<text x="${tx}" y="${ty}" fill="#56606b" font-size="9" text-anchor="middle" dominant-baseline="middle">${c > 0 ? '+' + c : c}</text>`; }
+    s += `<line class="tk${major ? ' mj' : ''}${c ? '' : ' z'}" x1="${a}" y1="${b}" x2="${e}" y2="${f}" stroke-width="${c ? 1.5 : 2.5}" stroke-linecap="round"/>`;
+    if (labels && major && c) { const [tx, ty] = pt(c, R + 12); s += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle">${c > 0 ? '+' + c : c}</text>`; }
   }
-  $('#ticks').innerHTML = s;
-})();
+  return s;
+}
+$('#arcTicks').innerHTML = ticksSVG(CX, CY, 125, DEG, true);
+$('#ringTicks').innerHTML = ticksSVG(150, 150, 140, RING, false);
+$('#bar').insertAdjacentHTML('afterbegin', Array.from({ length: 21 }, (_, i) => `<i class="${i % 2 ? '' : 'mj'}${i === 10 ? ' z' : ''}" style="left:${i * 5}%"></i>`).join(''));
+const ledEls = Array.from({ length: 21 }, (_, i) => { const e = document.createElement('i'); if (i === 10) e.className = 'c'; $('#leds').append(e); return e; });
+const ringDot = $('#ringDot'), barMark = $('#barMark');
+let litIdx = -1;
+function renderMeter() {
+  const c = Math.max(-50, Math.min(50, shown)), a = c * RING * Math.PI / 180;
+  needle.setAttribute('transform', `rotate(${c * DEG} ${CX} ${CY})`);
+  ringDot.setAttribute('cx', 150 + 122 * Math.sin(a)); ringDot.setAttribute('cy', 150 - 122 * Math.cos(a));
+  barMark.style.left = (50 + c) + '%';
+  const idx = tuner.dataset.st === 'idle' ? -1 : Math.round(c / 5) + 10;
+  if (idx !== litIdx) { ledEls[litIdx]?.classList.remove('lit'); ledEls[idx]?.classList.add('lit'); litIdx = idx; }
+}
 
 /* ---------- Tuner ---------- */
 const tuner = $('#tuner'), statusEl = $('#status'), needle = $('#needle');
@@ -211,7 +260,7 @@ function loop() {
     } else if (hist.length && performance.now() - lastSeen > 1500) clearReadout('Toque uma corda');
   }
   shown += (target - shown) * 0.2;
-  needle.setAttribute('transform', `rotate(${Math.max(-50, Math.min(50, shown)) * DEG} ${CX} ${CY})`);
+  renderMeter();
 }
 
 async function wake() { try { wl = await navigator.wakeLock?.request('screen'); } catch {} }
@@ -235,8 +284,8 @@ function stopMic() {
   stream?.getTracks().forEach(t => t.stop()); stream = null;
   wl?.release().catch(() => {}); wl = null;
   $('#mic').classList.remove('on'); $('#mic').textContent = 'Ligar afinador';
-  shown = 0; needle.setAttribute('transform', '');
-  clearReadout('Afinador desligado');
+  shown = 0;
+  clearReadout('Afinador desligado'); renderMeter();
 }
 $('#mic').onclick = () => running ? stopMic() : startMic();
 
@@ -317,6 +366,19 @@ $('#m1').onclick = () => setA4(a4 - 1);
 $('#p1').onclick = () => setA4(a4 + 1);
 $$('[data-a4]').forEach(b => b.onclick = () => setA4(+b.dataset.a4));
 syncOpts(); setA4(a4);
+
+// Temas
+const THEMES = { arco: ['Arco', '#0b0d10', '#37d67a'], regua: ['Régua', '#f5f3ef', '#1d1d1b'], anel: ['Anel', '#000000', '#f2f2f2'], leds: ['LEDs', '#0f1320', '#2dd4bf'] };
+function setTheme(t) {
+  if (!THEMES[t]) t = 'arco';
+  document.documentElement.dataset.theme = t; store('theme', t);
+  $('meta[name=theme-color]').content = THEMES[t][1];
+  $$('[data-tb]').forEach(b => b.classList.toggle('on', b.dataset.tb === t));
+}
+$('#themes').innerHTML = Object.entries(THEMES).map(([k, [n, bg, fg]]) =>
+  `<button data-tb="${k}"><span class="sw" style="background:linear-gradient(135deg,${bg} 55%,${fg} 55%)"></span>${n}</button>`).join('');
+$('#themes').onclick = e => { const b = e.target.closest('[data-tb]'); if (b) setTheme(b.dataset.tb); };
+setTheme(store('theme')); renderMeter();
 
 // Instalação PWA
 const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
