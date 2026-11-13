@@ -59,6 +59,7 @@ PWA estático para GitHub Pages. Sem build, sem dependências. **Todos os caminh
 - `install` → `skipWaiting`; `activate` → apaga caches ≠ atual + `clients.claim`.
 - Fetch: só GET mesma origem, cache-first, fallback rede (e guarda), navegação offline → `./index.html`.
 - **A cada deploy com mudança, incrementar `CACHE` em `sw.js`** (senão usuários ficam na versão antiga).
+- Essa é a fonte única da versão: o menu ⚙ lê `./sw.js` e exibe o `vN`.
 - Registro: `navigator.serviceWorker.register('./sw.js')` (sem `/` inicial).
 
 ## Deploy (GitHub Pages)
