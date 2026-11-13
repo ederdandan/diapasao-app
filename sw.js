@@ -1,4 +1,4 @@
-const CACHE = 'diapason-v7';
+const CACHE = 'diapason-v8';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

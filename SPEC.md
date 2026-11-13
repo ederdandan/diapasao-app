@@ -17,6 +17,7 @@ PWA estático para GitHub Pages. Sem build, sem dependências. **Todos os caminh
 - Todas as opções (calibração A4, instrumento, timbre, oitava, dicas) ficam no menu ⚙ (bottom sheet com `<dialog>`).
 - 4 temas minimalistas (menu ⚙, salvo em `localStorage`), cada um com cores (tokens CSS em `[data-theme]`) e medidor próprios:
   `arco` (escuro, ponteiro semicircular), `regua` (claro, régua linear), `anel` (preto OLED, ponto num anel com a nota no centro), `leds` (azul, 21 LEDs de 5 cents).
+- Tela fixa sem scroll (só o menu ⚙ rola internamente) e sem zoom (viewport + `touch-action` + bloqueio de gesture/ctrl+roda); medidores dimensionados por `dvh` para caber em telas baixas.
 - Viola: cada par é uma coluna (nota principal + corda de oitava abaixo).
 
 ## Áudio
