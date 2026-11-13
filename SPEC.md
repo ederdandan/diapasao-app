@@ -69,3 +69,9 @@ PWA estático para GitHub Pages. Sem build, sem dependências. **Todos os caminh
 2. Settings → Pages → Source: *Deploy from a branch* → `main` / `/ (root)` → Save.
 3. Acessar `https://<usuario>.github.io/<repositorio>/` (HTTPS — necessário para microfone e SW).
 4. No celular: "Adicionar à tela inicial" / "Instalar app".
+
+## Metrônomo (aba "Metrônomo")
+- 30–250 BPM: −/+, slider, atalhos 60/80/100/120/140, **Tap tempo** (média dos últimos toques), nome do andamento (Largo…Prestissimo).
+- Compassos 2/4, 3/4, 4/4, 6/8 (6/8 com acento secundário no 4º); subdivisão semínima, colcheia, tercina, semicolcheia.
+- Agendamento por lookahead (`setTimeout` 25 ms + relógio do `AudioContext`, janela 120 ms) — tempo preciso, sem drift; cliques curtos com envelope (acento 1600 Hz, tempo 1000 Hz, subdivisão 750 Hz).
+- Bolinhas de tempo sincronizadas ao áudio; Wake Lock enquanto toca. Aba, BPM, compasso e subdivisão persistidos.

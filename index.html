@@ -58,6 +58,24 @@ h1{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute
 .m-led i{width:calc((100% - 80px)/21);max-width:14px;height:22px;border-radius:3px;background:var(--line);transition:background .08s}
 .m-led i.c{height:34px}
 .m-led i.lit{background:var(--st);box-shadow:0 0 12px var(--st)}
+.tabs{display:flex;gap:2px;background:var(--s1);border:1px solid var(--line);border-radius:999px;padding:3px}
+.tabs button{border:0;background:none;box-shadow:none;border-radius:999px;min-height:36px;padding:6px 14px;font-size:13px;color:var(--muted)}
+.tabs button.on{background:var(--s2);color:var(--text)}
+.view{display:flex;flex-direction:column;gap:20px;flex:1}
+.view[hidden]{display:none}
+.dots{display:flex;justify-content:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+.dots i{width:18px;height:18px;border-radius:50%;background:var(--line);transition:background .05s,transform .05s}
+.dots i.a{outline:2px solid var(--tick);outline-offset:3px}
+.dots i.on{background:var(--ok);transform:scale(1.25)}
+.bpm{display:flex;align-items:center;justify-content:space-between;text-align:center;margin-top:12px}
+.bpm b{display:block;font-size:88px;font-weight:var(--noteW);line-height:1;font-variant-numeric:tabular-nums}
+.bpm span{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.bpm button{width:56px;height:56px;border-radius:50%;font-size:24px;padding:0}
+#bpmq button{font-variant-numeric:tabular-nums}
+.metctl{margin-top:auto}
+#tap{flex:0 0 96px;border-radius:999px}
+#play{flex:1;border-radius:999px;font-weight:600}
+#play.on{background:transparent;color:var(--muted)}
 .themes{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .themes button{display:flex;align-items:center;gap:10px}
 .sw{width:22px;height:22px;border-radius:6px;flex:none;border:1px solid #8884}
@@ -95,10 +113,11 @@ input[type=range]{width:100%;accent-color:var(--ok);margin:10px 0 0;height:28px}
 <body>
 <main>
   <header>
-    <h1>Afinador</h1>
+    <nav class="tabs"><button data-view="tuner">Afinador</button><button data-view="met">Metrônomo</button></nav>
     <button class="icon" id="openCfg" aria-label="Configurações">⚙</button>
   </header>
 
+  <div class="view" id="v-tuner">
   <section id="tuner" data-st="idle">
     <div class="meter m-arc"><svg viewBox="0 0 300 170" aria-hidden="true">
       <g id="arcTicks"></g>
@@ -120,6 +139,21 @@ input[type=range]{width:100%;accent-color:var(--ok);margin:10px 0 0;height:28px}
     <div class="strings" id="strings"></div>
     <button id="a4btn">Lá A4</button>
   </section>
+  </div>
+
+  <div class="view" id="v-met" hidden>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+    <div class="bpm">
+      <button id="bm" aria-label="Menos 1 BPM">−</button>
+      <div><b id="bpmv">100</b><span>BPM · <span id="tname"></span></span></div>
+      <button id="bp" aria-label="Mais 1 BPM">+</button>
+    </div>
+    <input id="bpms" type="range" min="30" max="250" step="1" aria-label="Andamento em BPM">
+    <div class="seg" id="bpmq"></div>
+    <div class="field"><label>Compasso</label><div class="seg" id="sig"></div></div>
+    <div class="field"><label>Subdivisão</label><div class="seg" id="subd"></div></div>
+    <div class="row metctl"><button id="tap">Tap</button><button id="play">▶ Iniciar</button></div>
+  </div>
 </main>
 
 <dialog id="cfg">
@@ -264,7 +298,8 @@ function loop() {
 }
 
 async function wake() { try { wl = await navigator.wakeLock?.request('screen'); } catch {} }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && running) wake(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && (running || metOn)) wake(); });
+function unwake() { if (!running && !metOn) { wl?.release().catch(() => {}); wl = null; } }
 
 async function startMic() {
   const c = ac();
@@ -282,7 +317,7 @@ async function startMic() {
 function stopMic() {
   running = false; cancelAnimationFrame(raf);
   stream?.getTracks().forEach(t => t.stop()); stream = null;
-  wl?.release().catch(() => {}); wl = null;
+  unwake();
   $('#mic').classList.remove('on'); $('#mic').textContent = 'Ligar afinador';
   shown = 0;
   clearReadout('Afinador desligado'); renderMeter();
@@ -366,6 +401,87 @@ $('#m1').onclick = () => setA4(a4 - 1);
 $('#p1').onclick = () => setA4(a4 + 1);
 $$('[data-a4]').forEach(b => b.onclick = () => setA4(+b.dataset.a4));
 syncOpts(); setA4(a4);
+
+/* ---------- Metrônomo (agendamento por lookahead no relógio do AudioContext) ---------- */
+const SIGS = { '2/4': [2, [0]], '3/4': [3, [0]], '4/4': [4, [0]], '6/8': [6, [0, 3]] };
+const SUBS = [[1, 'Semínima'], [2, 'Colcheia'], [3, 'Tercina'], [4, 'Semicolcheia']];
+const TNAMES = [[60, 'Largo'], [66, 'Larghetto'], [76, 'Adagio'], [108, 'Andante'], [120, 'Moderato'], [156, 'Allegro'], [176, 'Vivace'], [200, 'Presto'], [999, 'Prestissimo']];
+let bpm = +store('bpm') || 100, sig = SIGS[store('sig')] ? store('sig') : '4/4', sub = +store('sub') || 1;
+let metOn = false, metTimer, metRaf, nextT = 0, step = 0, beatQ = [], taps = [], dotEls = [];
+// kind: 0 acento, 1 tempo, 2 subdivisão, 3 acento secundário
+function click(t, kind) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.frequency.value = [1600, 1000, 750, 1300][kind];
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime([0.9, 0.6, 0.25, 0.75][kind], t + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+  o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.06);
+}
+function sched() {
+  const [n, acc] = SIGS[sig];
+  while (nextT < ctx.currentTime + 0.12) {
+    const beat = Math.floor(step / sub) % n, onBeat = step % sub === 0;
+    click(nextT, !onBeat ? 2 : beat === 0 ? 0 : acc.includes(beat) ? 3 : 1);
+    if (onBeat) beatQ.push([nextT, beat]);
+    nextT += 60 / bpm / sub; step++;
+  }
+  metTimer = setTimeout(sched, 25);
+}
+function metDraw() {
+  metRaf = requestAnimationFrame(metDraw);
+  while (beatQ.length && beatQ[0][0] <= ctx.currentTime) {
+    const b = beatQ.shift()[1];
+    dotEls.forEach((d, i) => d.classList.toggle('on', i === b));
+  }
+}
+function startMet() {
+  ac(); metOn = true; step = 0; beatQ = []; nextT = ctx.currentTime + 0.06;
+  sched(); metDraw(); wake();
+  $('#play').classList.add('on'); $('#play').textContent = '■ Parar';
+}
+function stopMet() {
+  metOn = false; clearTimeout(metTimer); cancelAnimationFrame(metRaf); beatQ = [];
+  dotEls.forEach(d => d.classList.remove('on')); unwake();
+  $('#play').classList.remove('on'); $('#play').textContent = '▶ Iniciar';
+}
+function setBpm(v) {
+  bpm = Math.min(250, Math.max(30, Math.round(v))); store('bpm', bpm);
+  $('#bpmv').textContent = bpm; $('#bpms').value = bpm;
+  $('#tname').textContent = TNAMES.find(([max]) => bpm < max)[1];
+  $$('#bpmq button').forEach(b => b.classList.toggle('on', +b.textContent === bpm));
+}
+function renderMet() {
+  const [n, acc] = SIGS[sig];
+  $('#dots').innerHTML = Array.from({ length: n }, (_, i) => `<i class="${acc.includes(i) ? 'a' : ''}"></i>`).join('');
+  dotEls = [...$$('#dots i')];
+  $$('#sig button').forEach(b => b.classList.toggle('on', b.textContent === sig));
+  $$('#subd button').forEach(b => b.classList.toggle('on', +b.dataset.sub === sub));
+}
+$('#bpmq').innerHTML = [60, 80, 100, 120, 140].map(v => `<button>${v}</button>`).join('');
+$('#sig').innerHTML = Object.keys(SIGS).map(s => `<button>${s}</button>`).join('');
+$('#subd').innerHTML = SUBS.map(([v, l]) => `<button data-sub="${v}">${l}</button>`).join('');
+$('#bpmq').onclick = e => { if (e.target.tagName === 'BUTTON') setBpm(+e.target.textContent); };
+$('#sig').onclick = e => { if (e.target.tagName !== 'BUTTON') return; sig = e.target.textContent; store('sig', sig); step = 0; renderMet(); };
+$('#subd').onclick = e => { const b = e.target.closest('[data-sub]'); if (!b) return; sub = +b.dataset.sub; store('sub', sub); step = Math.ceil(step / sub) * sub; renderMet(); };
+$('#bpms').oninput = e => setBpm(+e.target.value);
+$('#bm').onclick = () => setBpm(bpm - 1);
+$('#bp').onclick = () => setBpm(bpm + 1);
+$('#play').onclick = () => metOn ? stopMet() : startMet();
+$('#tap').onclick = () => {
+  const now = performance.now();
+  if (taps.length && now - taps[taps.length - 1] > 2000) taps = [];
+  taps.push(now); if (taps.length > 5) taps.shift();
+  if (taps.length > 1) setBpm(60000 * (taps.length - 1) / (now - taps[0]));
+};
+setBpm(bpm); renderMet();
+
+function setView(v) {
+  if (v !== 'met') v = 'tuner';
+  $('#v-tuner').hidden = v !== 'tuner'; $('#v-met').hidden = v !== 'met'; store('view', v);
+  $$('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+}
+$$('[data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+setView(store('view'));
 
 // Temas
 const THEMES = { arco: ['Arco', '#0b0d10', '#37d67a'], regua: ['Régua', '#f5f3ef', '#1d1d1b'], anel: ['Anel', '#000000', '#f2f2f2'], leds: ['LEDs', '#0f1320', '#2dd4bf'] };
