@@ -108,6 +108,10 @@ input[type=range]{width:100%;accent-color:var(--ok);margin:10px 0 0;height:28px}
       <div class="seg"><button data-oct="0">Normal</button><button data-oct="1">Uma oitava acima</button></div>
     </div>
     <p class="hint">Toque numa nota para ouvir e de novo para parar. Enquanto o tom toca, o afinador pausa. No iPhone, desative o modo silencioso. O timbre rico e a oitava acima ajudam a ouvir notas graves em alto-falante de celular.</p>
+    <div class="field" id="installBox" hidden><label>Aplicativo</label>
+      <button id="install" style="width:100%">Instalar app</button>
+      <p class="hint" id="iosHint" hidden style="margin-top:8px">No iPhone/iPad (Safari): toque em <b>Compartilhar</b> ⬆︎ e depois em <b>Adicionar à Tela de Início</b>.</p>
+    </div>
     <p class="hint" style="text-align:center;opacity:.7">Versão <span id="ver">—</span></p>
   </div>
 </dialog>
@@ -313,6 +317,20 @@ $('#m1').onclick = () => setA4(a4 - 1);
 $('#p1').onclick = () => setA4(a4 + 1);
 $$('[data-a4]').forEach(b => b.onclick = () => setA4(+b.dataset.a4));
 syncOpts(); setA4(a4);
+
+// Instalação PWA
+const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let deferredInstall;
+if (!standalone && isIOS) { $('#installBox').hidden = false; $('#install').hidden = true; $('#iosHint').hidden = false; }
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; $('#installBox').hidden = false; });
+addEventListener('appinstalled', () => { deferredInstall = null; $('#installBox').hidden = true; });
+$('#install').onclick = async () => {
+  if (!deferredInstall) return;
+  deferredInstall.prompt();
+  await deferredInstall.userChoice.catch(() => {});
+  deferredInstall = null; $('#installBox').hidden = true;
+};
 
 // Versão = nome do cache em sw.js (fonte única)
 fetch('./sw.js').then(r => r.text()).then(t => { const m = t.match(/diapason-(v\d+)/); if (m) $('#ver').textContent = m[1]; }).catch(() => {});
