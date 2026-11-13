@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0e1114">
+<meta name="theme-color" content="#0b0d10">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,105 +13,121 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <style>
-:root{--bg:#0e1114;--p1:#1e242b;--p2:#161a1f;--line:#2a323b;--text:#e6ebf0;--muted:#8a96a3;--ok:#37d67a;--low:#ffb020;--high:#ff6b5d;--st:var(--muted)}
+:root{--bg:#0b0d10;--s1:#14171b;--s2:#1b1f24;--line:#242a31;--text:#e8ecf0;--muted:#7d8792;--ok:#37d67a;--low:#ffb020;--high:#ff6b5d;--st:var(--muted)}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
-body{padding:max(12px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
-main{max-width:520px;margin:0 auto;display:grid;gap:12px}
-header{display:flex;align-items:center;gap:10px}
-header img{width:28px;height:28px}
-h1{font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0;flex:1}
-h2{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
-.panel{background:linear-gradient(180deg,var(--p1),var(--p2));border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:inset 0 1px 0 #ffffff0d,0 6px 18px #0007}
-button{font:inherit;color:var(--text);background:#232a32;border:1px solid #343d48;border-radius:10px;padding:8px 12px;min-height:44px;cursor:pointer;box-shadow:inset 0 1px 0 #ffffff12;touch-action:manipulation}
-button:active{transform:translateY(1px)}
-button.on{background:#173a26;border-color:var(--ok);color:#c4f7d6}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.grow{flex:1}
-#mic{min-width:150px;font-weight:600}
-#mic.on{background:#3a1717;border-color:var(--high);color:#ffd0cb}
-.lcd{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px;margin-top:-4px}
+body{padding:max(10px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+main{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:20px;min-height:calc(100dvh - 26px)}
+button{font:inherit;color:var(--text);background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-height:44px;cursor:pointer;touch-action:manipulation;transition:background .15s,border-color .15s,color .15s}
+button:active{transform:scale(.97)}
+button.on{background:color-mix(in srgb,var(--ok) 16%,var(--s2));border-color:var(--ok);color:#c9f7da}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:600}
+.icon{background:none;border:0;width:44px;padding:0;color:var(--muted);font-size:22px}
+#tuner{text-align:center}
 #gauge{width:100%;display:block}
-.screen{position:relative;background:#0a0d10;border:1px solid #232a32;border-radius:10px;padding:8px 8px 4px;box-shadow:inset 0 2px 10px #000a}
-.note{text-align:center;margin-top:-58px;height:80px;position:relative}
-#note{font-size:56px;font-weight:700;color:var(--st);line-height:1;transition:color .15s}
-#oct{font-size:22px;color:var(--muted);font-weight:600}
-#solf{display:block;font-size:13px;color:var(--muted)}
-#status{text-align:center;font-weight:700;letter-spacing:.06em;padding:10px;margin-top:8px;border-radius:8px;border:1px solid var(--st);color:var(--st);background:color-mix(in srgb,var(--st) 12%,transparent);transition:all .15s;min-height:44px}
+#needle{stroke:var(--st);transition:stroke .15s}
+#hub{fill:var(--st);transition:fill .15s}
+.note{margin-top:-46px;line-height:1}
+#note{font-size:64px;font-weight:700;color:var(--st);transition:color .15s;letter-spacing:-.02em}
+#oct{font-size:22px;color:var(--muted);font-weight:600;margin-left:2px}
+.sub{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;margin-top:8px;min-height:18px}
+#status{display:inline-block;margin-top:14px;font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--st);transition:color .15s;min-height:20px}
 [data-st=ok]{--st:var(--ok)}[data-st=low]{--st:var(--low)}[data-st=high]{--st:var(--high)}
-#needle{transition:stroke .15s;stroke:var(--st)}
-.a4{display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums}
-.a4 b{font-size:30px;color:var(--ok)}
-input[type=range]{width:100%;accent-color:var(--ok);margin:10px 0;height:28px}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+#mic{display:block;margin:4px auto 0;min-width:200px;border-radius:999px;font-weight:600;padding:12px 24px}
+#mic.on{background:transparent;color:var(--muted)}
+.fork{margin-top:auto}
+.fork h2{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.fork h2 button{all:unset;cursor:pointer;color:var(--muted);letter-spacing:.06em;text-transform:none;font-size:12px}
+.strings{display:grid;gap:6px}
+.course{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.course span{font-size:10px;color:var(--muted);text-align:center}
+.course button{padding:6px 0;font-weight:600}
+.course button+button{min-height:34px;font-size:12px;font-weight:500;color:var(--muted)}
+.course button.on{color:#c9f7da}
+#a4btn{width:100%;margin-top:6px;font-size:13px;color:var(--muted)}
+#a4btn.on{color:#c9f7da}
+dialog{border:0;padding:0;background:transparent;color:var(--text);max-width:460px;width:100%;margin:auto auto 0}
+dialog::backdrop{background:#000a}
+.sheet{background:var(--s1);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:16px 16px max(20px,env(safe-area-inset-bottom));display:grid;gap:18px}
+.sheet header h1{color:var(--text);letter-spacing:.12em}
+.field label{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.row{display:flex;gap:6px;align-items:center}
+.a4{flex:1;font-variant-numeric:tabular-nums;color:var(--muted)}
+.a4 b{font-size:26px;color:var(--text);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--ok);margin:10px 0 0;height:28px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .seg button{font-size:13px;padding:6px}
-.notes{display:grid;gap:6px;grid-template-columns:repeat(3,1fr)}
-.notes.pairs{grid-template-columns:repeat(2,1fr)}
-.notes button{display:flex;flex-direction:column;align-items:center;line-height:1.15;padding:6px}
-.notes b{font-size:18px}
-.notes small,.hint{font-size:11px;color:var(--muted)}
-.notes .on small{color:#9fe6b9}
-.opts{margin-top:10px}
-.opts button{font-size:13px}
-.hint{margin:8px 0 0}
+.hint{font-size:12px;color:var(--muted);margin:0}
 </style>
 </head>
 <body>
 <main>
-  <header><img src="./icon.svg" alt=""><h1>Diapasão · Afinador</h1></header>
+  <header>
+    <h1>Afinador</h1>
+    <button class="icon" id="openCfg" aria-label="Configurações">⚙</button>
+  </header>
 
-  <section class="panel" id="tuner" data-st="idle">
-    <div class="screen">
-      <svg id="gauge" viewBox="0 0 300 175" aria-hidden="true">
-        <g id="ticks"></g>
-        <line id="needle" x1="150" y1="160" x2="150" y2="42" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="150" cy="160" r="8" fill="#2a323b" stroke="#444f5b"/>
-      </svg>
-      <div class="note"><span id="note">–</span><span id="oct"></span><span id="solf">&nbsp;</span></div>
-      <div class="lcd"><span id="hz">— Hz</span><span id="cents">— cents</span></div>
-    </div>
-    <div id="status" role="status" aria-live="polite">AFINADOR DESLIGADO</div>
-    <div class="row" style="margin-top:10px"><button id="mic" class="grow">🎤 Ligar afinador</button></div>
+  <section id="tuner" data-st="idle">
+    <svg id="gauge" viewBox="0 0 300 170" aria-hidden="true">
+      <g id="ticks"></g>
+      <line id="needle" x1="150" y1="160" x2="150" y2="48" stroke-width="2.5" stroke-linecap="round"/>
+      <circle id="hub" cx="150" cy="160" r="5"/>
+    </svg>
+    <div class="note"><span id="note">–</span><span id="oct"></span></div>
+    <div class="sub" id="sub">&nbsp;</div>
+    <div id="status" role="status" aria-live="polite">Afinador desligado</div>
   </section>
 
-  <section class="panel">
-    <h2>Calibração</h2>
-    <div class="row">
-      <div class="a4 grow">A4 = <b id="a4v">440</b> Hz</div>
-      <button id="m1">−1</button><button id="p1">+1</button>
-      <button data-a4="432">432</button><button data-a4="440">440</button>
-    </div>
-    <input id="a4s" type="range" min="415" max="466" step="1" value="440" aria-label="Frequência de referência A4">
-  </section>
+  <button id="mic">Ligar afinador</button>
 
-  <section class="panel">
-    <h2>Diapasão sonoro</h2>
-    <div class="seg" id="inst"></div>
-    <div class="notes" id="notes"></div>
-    <div class="row opts">
-      <button id="a4btn" class="grow">Lá (A4)</button>
-      <button id="rich">Timbre: Puro</button>
-      <button id="oct8">Oitava ↑</button>
-      <button id="stop">■ Parar</button>
-    </div>
-    <p class="hint">Enquanto o tom toca, a detecção do afinador fica pausada. iPhone: desative o modo silencioso para ouvir o tom.</p>
+  <section class="fork">
+    <h2><span>Diapasão · <span id="instName"></span></span><button id="cfgChip"></button></h2>
+    <div class="strings" id="strings"></div>
+    <button id="a4btn">Lá A4</button>
   </section>
 </main>
+
+<dialog id="cfg">
+  <div class="sheet">
+    <header><h1>Configurações</h1><button class="icon" id="closeCfg" aria-label="Fechar">✕</button></header>
+    <div class="field">
+      <label>Calibração</label>
+      <div class="row">
+        <div class="a4">A4 <b id="a4v">440</b> Hz</div>
+        <button id="m1" aria-label="Menos 1 Hz">−1</button><button id="p1" aria-label="Mais 1 Hz">+1</button>
+        <button data-a4="432">432</button><button data-a4="440">440</button>
+      </div>
+      <input id="a4s" type="range" min="415" max="466" step="1" value="440" aria-label="Frequência de referência A4">
+    </div>
+    <div class="field"><label>Instrumento</label><div class="seg" id="inst"></div></div>
+    <div class="field"><label>Timbre do diapasão</label>
+      <div class="seg"><button data-rich="0">Puro (senoide)</button><button data-rich="1">Rico (harmônicos)</button></div>
+    </div>
+    <div class="field"><label>Oitava</label>
+      <div class="seg"><button data-oct="0">Normal</button><button data-oct="1">Uma oitava acima</button></div>
+    </div>
+    <p class="hint">Toque numa nota para ouvir e de novo para parar. Enquanto o tom toca, o afinador pausa. No iPhone, desative o modo silencioso. O timbre rico e a oitava acima ajudam a ouvir notas graves em alto-falante de celular.</p>
+  </div>
+</dialog>
+
 <script>
-const $ = s => document.querySelector(s);
+const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
 const NOTES = ['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
 const SOLF = ['Dó','Dó♯','Ré','Ré♯','Mi','Fá','Fá♯','Sol','Sol♯','Lá','Lá♯','Si'];
+// courses: [label, main midi, octave midi?]
 const INST = {
-  violao: { name: 'Violão', notes: [[40,'6ª'],[45,'5ª'],[50,'4ª'],[55,'3ª'],[59,'2ª'],[64,'1ª']] },
-  mi: { name: 'Cebolão Mi', pairs: true, notes: [[47,'5ª'],[59,'5ª oitava'],[52,'4ª'],[64,'4ª oitava'],[56,'3ª'],[68,'3ª oitava'],[59,'2ª'],[64,'1ª']] },
-  re: { name: 'Cebolão Ré', pairs: true, notes: [[45,'5ª'],[57,'5ª oitava'],[50,'4ª'],[62,'4ª oitava'],[54,'3ª'],[66,'3ª oitava'],[57,'2ª'],[62,'1ª']] }
+  violao: { name: 'Violão', courses: [['6ª',40],['5ª',45],['4ª',50],['3ª',55],['2ª',59],['1ª',64]] },
+  mi: { name: 'Cebolão Mi', courses: [['5ª',47,59],['4ª',52,64],['3ª',56,68],['2ª',59],['1ª',64]] },
+  re: { name: 'Cebolão Ré', courses: [['5ª',45,57],['4ª',50,62],['3ª',54,66],['2ª',57],['1ª',62]] }
 };
 const store = (k, v) => { try { v === undefined ? (v = localStorage.getItem(k)) : localStorage.setItem(k, v); } catch { v = null; } return v; };
 
 let a4 = +store('a4'); if (!(a4 >= 415 && a4 <= 466)) a4 = 440;
 let inst = INST[store('inst')] ? store('inst') : 'violao';
+let rich = store('rich') === '1', octUp = store('oct') === '1';
 const freqOf = m => a4 * Math.pow(2, (m - 69) / 12);
-const nameOf = m => NOTES[m % 12].replace('♯', '#') + (Math.floor(m / 12) - 1);
+const nameOf = m => NOTES[m % 12] + (Math.floor(m / 12) - 1);
 
 let ctx;
 function ac() {
@@ -121,19 +137,16 @@ function ac() {
 }
 
 /* ---------- Gauge ---------- */
-const CX = 150, CY = 160, R = 120, DEG = 1.6; // ±50 cents -> ±80°
+const CX = 150, CY = 160, R = 125, DEG = 1.6; // ±50 cents -> ±80°
 (function drawGauge() {
   const pt = (c, r) => { const a = c * DEG * Math.PI / 180; return [CX + r * Math.sin(a), CY - r * Math.cos(a)]; };
-  let s = '';
   const [x1, y1] = pt(-3, R), [x2, y2] = pt(3, R);
-  s += `<path d="M${x1} ${y1}A${R} ${R} 0 0 1 ${x2} ${y2}" stroke="#37d67a" stroke-width="14" fill="none" opacity=".35"/>`;
+  let s = `<path d="M${x1} ${y1}A${R} ${R} 0 0 1 ${x2} ${y2}" stroke="#37d67a" stroke-width="10" stroke-linecap="round" fill="none" opacity=".3"/>`;
   for (let c = -50; c <= 50; c += 5) {
-    const major = c % 10 === 0, [a, b] = pt(c, R - (major ? 14 : 7)), [e, f] = pt(c, R + 4);
-    const col = c === 0 ? '#37d67a' : c < 0 ? '#7a6230' : '#7a3a34';
-    s += `<line x1="${a}" y1="${b}" x2="${e}" y2="${f}" stroke="${major ? col : '#3a434d'}" stroke-width="${c === 0 ? 3 : major ? 2 : 1}"/>`;
-    if (major) { const [tx, ty] = pt(c, R + 16); s += `<text x="${tx}" y="${ty}" fill="#6b7682" font-size="10" text-anchor="middle" dominant-baseline="middle">${c > 0 ? '+' + c : c}</text>`; }
+    const major = c % 10 === 0, [a, b] = pt(c, R - (major ? 10 : 5)), [e, f] = pt(c, R);
+    s += `<line x1="${a}" y1="${b}" x2="${e}" y2="${f}" stroke="${c === 0 ? '#37d67a' : major ? '#4a535d' : '#2c333b'}" stroke-width="${c === 0 ? 2.5 : 1.5}" stroke-linecap="round"/>`;
+    if (major && c) { const [tx, ty] = pt(c, R + 12); s += `<text x="${tx}" y="${ty}" fill="#56606b" font-size="9" text-anchor="middle" dominant-baseline="middle">${c > 0 ? '+' + c : c}</text>`; }
   }
-  s += `<text x="38" y="168" fill="#ffb020" font-size="16">♭</text><text x="254" y="168" fill="#ff6b5d" font-size="16">♯</text>`;
   $('#ticks').innerHTML = s;
 })();
 
@@ -144,8 +157,7 @@ let analyser, stream, buf, yb, running = false, raf, frame = 0, hist = [], targe
 function setStatus(st, text) { tuner.dataset.st = st; statusEl.textContent = text; }
 function clearReadout(text) {
   hist = []; target = 0; inTune = false;
-  $('#note').textContent = '–'; $('#oct').textContent = ''; $('#solf').innerHTML = '&nbsp;';
-  $('#hz').textContent = '— Hz'; $('#cents').textContent = '— cents';
+  $('#note').textContent = '–'; $('#oct').textContent = ''; $('#sub').innerHTML = '&nbsp;';
   setStatus('idle', text);
 }
 
@@ -168,22 +180,20 @@ function yin(x, sr) {
 }
 
 function show(f) {
-  const m = 69 + 12 * Math.log2(f / a4), n = Math.round(m), c = (m - n) * 100, ac_ = Math.abs(c);
+  const m = 69 + 12 * Math.log2(f / a4), n = Math.round(m), c = (m - n) * 100, abs = Math.abs(c);
   $('#note').textContent = NOTES[n % 12];
   $('#oct').textContent = Math.floor(n / 12) - 1;
-  $('#solf').textContent = SOLF[n % 12];
-  $('#hz').textContent = f.toFixed(1) + ' Hz';
-  $('#cents').textContent = (c >= 0 ? '+' : '') + c.toFixed(1) + ' cents';
+  $('#sub').textContent = `${SOLF[n % 12]} · ${f.toFixed(1)} Hz · ${c >= 0 ? '+' : ''}${c.toFixed(0)} cents`;
   target = c;
-  inTune = inTune ? ac_ <= 4 : ac_ <= 3;
+  inTune = inTune ? abs <= 4 : abs <= 3;
   if (inTune) setStatus('ok', 'AFINADO');
-  else if (c < 0) setStatus('low', 'BAIXO — SUBIR AFINAÇÃO ♭');
-  else setStatus('high', 'ALTO — BAIXAR AFINAÇÃO ♯');
+  else if (c < 0) setStatus('low', '♭ BAIXO — SUBIR AFINAÇÃO');
+  else setStatus('high', '♯ ALTO — BAIXAR AFINAÇÃO');
 }
 
 function loop() {
   raf = requestAnimationFrame(loop);
-  if (toneMidi !== null) { target = 0; }
+  if (toneMidi !== null) target = 0;
   else if (!(frame++ & 1)) { // ~30 detections/s
     analyser.getFloatTimeDomainData(buf);
     let rms = 0; for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
@@ -193,7 +203,7 @@ function loop() {
       hist.push(f); if (hist.length > 5) hist.shift();
       show([...hist].sort((a, b) => a - b)[hist.length >> 1]);
       lastSeen = performance.now();
-    } else if (hist.length && performance.now() - lastSeen > 1500) clearReadout('TOQUE UMA CORDA');
+    } else if (hist.length && performance.now() - lastSeen > 1500) clearReadout('Toque uma corda');
   }
   shown += (target - shown) * 0.2;
   needle.setAttribute('transform', `rotate(${Math.max(-50, Math.min(50, shown)) * DEG} ${CX} ${CY})`);
@@ -206,27 +216,27 @@ async function startMic() {
   const c = ac();
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-  } catch (e) { setStatus('high', 'MICROFONE NEGADO OU INDISPONÍVEL'); return; }
+  } catch (e) { setStatus('high', 'Microfone negado ou indisponível'); return; }
   analyser = c.createAnalyser(); analyser.fftSize = 4096;
   const mute = c.createGain(); mute.gain.value = 0;
   c.createMediaStreamSource(stream).connect(analyser); analyser.connect(mute); mute.connect(c.destination);
   buf = new Float32Array(analyser.fftSize);
-  running = true; $('#mic').classList.add('on'); $('#mic').textContent = '■ Desligar afinador';
-  clearReadout(toneMidi !== null ? 'DETECÇÃO PAUSADA (TOM TOCANDO)' : 'TOQUE UMA CORDA');
+  running = true; $('#mic').classList.add('on'); $('#mic').textContent = 'Desligar afinador';
+  clearReadout(toneMidi !== null ? 'Pausado enquanto o tom toca' : 'Toque uma corda');
   wake(); loop();
 }
 function stopMic() {
   running = false; cancelAnimationFrame(raf);
   stream?.getTracks().forEach(t => t.stop()); stream = null;
   wl?.release().catch(() => {}); wl = null;
-  $('#mic').classList.remove('on'); $('#mic').textContent = '🎤 Ligar afinador';
+  $('#mic').classList.remove('on'); $('#mic').textContent = 'Ligar afinador';
   shown = 0; needle.setAttribute('transform', '');
-  clearReadout('AFINADOR DESLIGADO');
+  clearReadout('Afinador desligado');
 }
 $('#mic').onclick = () => running ? stopMic() : startMic();
 
 /* ---------- Tone generator ---------- */
-let osc, gain, toneMidi = null, toneKey = null, rich = false, octUp = false;
+let osc, gain, toneMidi = null, toneKey = null;
 const toneFreq = () => freqOf(toneMidi) * (octUp ? 2 : 1);
 function setWave() {
   if (!osc) return;
@@ -243,7 +253,7 @@ function play(midi, key) {
     osc.connect(gain); osc.start();
     gain.gain.setTargetAtTime(0.3, t, 0.03);
   } else osc.frequency.setTargetAtTime(toneFreq(), t, 0.008);
-  if (running) clearReadout('DETECÇÃO PAUSADA (TOM TOCANDO)');
+  if (running) clearReadout('Pausado enquanto o tom toca');
   markActive();
 }
 function stopTone() {
@@ -253,43 +263,55 @@ function stopTone() {
     osc.stop(t + 0.3); osc = null; gain = null;
   }
   toneMidi = toneKey = null;
-  if (running) clearReadout('TOQUE UMA CORDA');
+  if (running) clearReadout('Toque uma corda');
   markActive();
 }
 function retune() { if (osc) osc.frequency.setTargetAtTime(toneFreq(), ctx.currentTime, 0.008); }
-function markActive() {
-  document.querySelectorAll('[data-key]').forEach(b => b.classList.toggle('on', b.dataset.key === toneKey));
-}
+function markActive() { $$('[data-key]').forEach(b => b.classList.toggle('on', b.dataset.key === toneKey)); }
 
-function renderInst() {
-  $('#inst').innerHTML = Object.entries(INST).map(([k, v]) => `<button data-inst="${k}" class="${k === inst ? 'on' : ''}">${v.name}</button>`).join('');
-  const I = INST[inst], el = $('#notes');
-  el.className = 'notes' + (I.pairs ? ' pairs' : '');
-  el.innerHTML = I.notes.map(([m, lbl], i) =>
-    `<button data-key="${inst}${i}" data-midi="${m}"><b>${nameOf(m)}</b><small>${lbl} · ${freqOf(m).toFixed(1)} Hz</small></button>`).join('');
+function renderStrings() {
+  const I = INST[inst], el = $('#strings');
+  el.style.gridTemplateColumns = `repeat(${I.courses.length},1fr)`;
+  el.innerHTML = I.courses.map(([lbl, ...ms], ci) =>
+    `<div class="course"><span>${lbl}</span>${ms.map((m, j) =>
+      `<button data-key="${inst}${ci}-${j}" data-midi="${m}" title="${freqOf(m).toFixed(1)} Hz">${nameOf(m)}</button>`).join('')}</div>`).join('');
+  $('#instName').textContent = I.name;
+  $$('[data-inst]').forEach(b => b.classList.toggle('on', b.dataset.inst === inst));
   markActive();
 }
-$('#inst').onclick = e => { const b = e.target.closest('[data-inst]'); if (!b) return; inst = b.dataset.inst; store('inst', inst); renderInst(); };
-$('#notes').onclick = e => { const b = e.target.closest('[data-midi]'); if (b) play(+b.dataset.midi, b.dataset.key); };
+$('#strings').onclick = e => { const b = e.target.closest('[data-midi]'); if (b) play(+b.dataset.midi, b.dataset.key); };
 $('#a4btn').dataset.key = 'a4';
 $('#a4btn').onclick = () => play(69, 'a4');
-$('#stop').onclick = stopTone;
-$('#rich').onclick = e => { rich = !rich; e.currentTarget.textContent = 'Timbre: ' + (rich ? 'Rico' : 'Puro'); e.currentTarget.classList.toggle('on', rich); setWave(); };
-$('#oct8').onclick = e => { octUp = !octUp; e.currentTarget.classList.toggle('on', octUp); retune(); };
 
-/* ---------- Calibration ---------- */
+/* ---------- Settings ---------- */
+const cfg = $('#cfg');
+$('#openCfg').onclick = $('#cfgChip').onclick = () => cfg.showModal();
+$('#closeCfg').onclick = () => cfg.close();
+cfg.onclick = e => { if (e.target === cfg) cfg.close(); };
+
+$('#inst').innerHTML = Object.entries(INST).map(([k, v]) => `<button data-inst="${k}">${v.name}</button>`).join('');
+$('#inst').onclick = e => { const b = e.target.closest('[data-inst]'); if (!b) return; if (toneKey !== 'a4') stopTone(); inst = b.dataset.inst; store('inst', inst); renderStrings(); };
+
+function syncOpts() {
+  $$('[data-rich]').forEach(b => b.classList.toggle('on', (b.dataset.rich === '1') === rich));
+  $$('[data-oct]').forEach(b => b.classList.toggle('on', (b.dataset.oct === '1') === octUp));
+}
+$$('[data-rich]').forEach(b => b.onclick = () => { rich = b.dataset.rich === '1'; store('rich', +rich); setWave(); syncOpts(); });
+$$('[data-oct]').forEach(b => b.onclick = () => { octUp = b.dataset.oct === '1'; store('oct', +octUp); retune(); syncOpts(); });
+
 function setA4(v) {
   a4 = Math.min(466, Math.max(415, Math.round(v)));
   $('#a4v').textContent = a4; $('#a4s').value = a4; store('a4', a4);
-  document.querySelectorAll('[data-a4]').forEach(b => b.classList.toggle('on', +b.dataset.a4 === a4));
-  $('#a4btn').innerHTML = `Lá (A4) · ${a4} Hz`;
-  hist = []; renderInst(); retune();
+  $$('[data-a4]').forEach(b => b.classList.toggle('on', +b.dataset.a4 === a4));
+  $('#a4btn').textContent = `Lá A4 · ${a4} Hz`;
+  $('#cfgChip').textContent = `A4 ${a4} Hz ⚙`;
+  hist = []; renderStrings(); retune();
 }
 $('#a4s').oninput = e => setA4(+e.target.value);
 $('#m1').onclick = () => setA4(a4 - 1);
 $('#p1').onclick = () => setA4(a4 + 1);
-document.querySelectorAll('[data-a4]').forEach(b => b.onclick = () => setA4(+b.dataset.a4));
-setA4(a4);
+$$('[data-a4]').forEach(b => b.onclick = () => setA4(+b.dataset.a4));
+syncOpts(); setA4(a4);
 
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 </script>

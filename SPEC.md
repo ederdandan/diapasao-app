@@ -12,6 +12,11 @@ PWA estático para GitHub Pages. Sem build, sem dependências. **Todos os caminh
 | `icon-192.png`, `icon-512.png` | Ícones PNG (Android/Chrome; o 512 também como `maskable`) |
 | `apple-touch-icon.png` | 180×180 — iOS não aceita SVG na tela inicial |
 
+## Interface (visual clean)
+- Tela principal: medidor, nota, status, botão do afinador e cordas do instrumento atual (toque toca/para o tom) + botão A4.
+- Todas as opções (calibração A4, instrumento, timbre, oitava, dicas) ficam no menu ⚙ (bottom sheet com `<dialog>`).
+- Viola: cada par é uma coluna (nota principal + corda de oitava abaixo).
+
 ## Áudio
 - `getUserMedia` com `echoCancellation`, `noiseSuppression`, `autoGainControl` = `false`.
 - `AudioContext` criado/retomado só após gesto do usuário (exigência iOS).
